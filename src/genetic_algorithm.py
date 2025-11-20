@@ -68,13 +68,13 @@ class GeneticGenerator:
 
     def infection_cave(self, i, j, state):
         if i == 0 or j == 0 or i == self.n - 1 or j == self.n - 1:
-            self.score -= 2
+            self.score -= 4
         else:
             self.score += 1
 
         left, up, right, down = self.count_dist(i, j, state)
         dist = sorted([left, up, right, down], reverse=True)
-        if dist[1] <= 2 and dist[2] <= 2 and dist[3] <= 3:
+        if dist[1] <= 2 and dist[2] <= 2 and dist[3] <= 2:
             self.score += 1
 
         state[i][j] = "*"
@@ -111,24 +111,13 @@ class GeneticGenerator:
         score = self.score
         self.score = 0
 
-        for i in range(0, self.n - 3):
-            for j in range(0, self.n - 3):
-                if state[i][j] == 0:
-                    if sum(state[i][j:j + 3]) + sum(state[i + 1][j:j + 3]) + sum(state[i + 2][j:j + 3]) + sum(
-                            state[i + 3][j:j + 3]) > 0:
-                        pass
-                        #score -= 3
-
-        for i in range(0, self.n - 3):
-            for j in range(0, self.n - 3):
-                if state[i][j] == 0:
-                    if state[i][j] + state[i + 1][j] + state[i + 2][j] + state[i + 3][j] > 0:
-                        pass
-                        #score -= 2
-
-                    if state[i][j] + state[i + 1][j] > 0:
-                        pass
-                        #score -= 0.2
+        for i in range(self.n):
+            for j in range(self.n):
+                if state[i][j] == 1:
+                    if 1 < i < self.n - 2 and 1 < j < self.n - 2:
+                        if state[i - 1][j] + state[i + 1][j] + state[i][j - 1] + state[i][j + 1] >= 3:
+                            if state[i - 2][j] + state[i + 2][j] + state[i][j - 2] + state[i][j + 2] <= 2:
+                                score += 2
 
         return score
 
@@ -141,7 +130,7 @@ class GeneticGenerator:
         for k in range(tries):
             for i in range(len(parents)):
                 for j in range(10):
-                    child = self.apply_mutations(chromosomes[i][0], 3)
+                    child = self.apply_mutations(chromosomes[i][0], 6)
                     result = self.fitness_function_cave(child)
                     if result > chromosomes[i][1]:
                         chromosomes[i] = (child, result)

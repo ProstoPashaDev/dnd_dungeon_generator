@@ -22,7 +22,7 @@ cave = [
 ]
 #print(generic_generator.fitness_function_cave(cave))
 
-res = generic_generator.start_evolution(1000)
+res = generic_generator.start_evolution(1500)
 #generic_generator.pretty_print(res)
 generic_generator.pretty_print_squares(res)
 
