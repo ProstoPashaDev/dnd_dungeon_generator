@@ -4,21 +4,24 @@ import random
 
 class GeneticGenerator:
 
-    def __init__(self, cave_type, size, traps, floors=1, n=10):
+    def __init__(self, cave_type, size, traps, floors=1, n=10, m=30, maps=3, mutations=0):
         self.type = cave_type
         self.size = size
         self.traps = traps
         self.floors = floors
         self.n = n
+        self.m = m
+        self.maps = maps
+        self.mutations = mutations if mutations != 0 else max(n, m) // 4
         self.score = 0
 
     def generate_parents(self):
         parents = []
-        for k in range(3):
+        for k in range(self.maps):
             chromosome = []
             for i in range(self.n):
                 a = []
-                for j in range(self.n):
+                for j in range(self.m):
                     a.append(random.randint(0, 1))
                 chromosome.append(a)
             parents.append(chromosome)
@@ -28,7 +31,7 @@ class GeneticGenerator:
         state_copy = copy.deepcopy(state)
         for i in range(amount):
             i = random.randint(0, self.n - 1)
-            j = random.randint(0, self.n - 1)
+            j = random.randint(0, self.m - 1)
             state_copy[i][j] = 0 if state[i][j] == 1 else 1
         return state_copy
 
@@ -57,8 +60,8 @@ class GeneticGenerator:
         left = max(j - s - 1, 0)
 
         # right
-        s = self.n - 1
-        for j1 in range(j + 1, self.n):
+        s = self.m - 1
+        for j1 in range(j + 1, self.m):
             if state[i][j1] == 1:
                 s = j1
                 break
@@ -67,7 +70,7 @@ class GeneticGenerator:
         return left, up, right, down
 
     def infection_cave(self, i, j, state):
-        if i == 0 or j == 0 or i == self.n - 1 or j == self.n - 1:
+        if i == 0 or j == 0 or i == self.n - 1 or j == self.m - 1:
             self.score -= 4
         else:
             self.score += 1
@@ -88,20 +91,22 @@ class GeneticGenerator:
         if j - 1 >= 0 and state[i][j - 1] == 0:
             self.infection_cave(i, j - 1, state)
 
-        if j + 1 < self.n and state[i][j + 1] == 0:
+        if j + 1 < self.m and state[i][j + 1] == 0:
             self.infection_cave(i, j + 1, state)
 
     def fitness_function_cave(self, state):
         entry = []
         for i in range(self.n):
-            if state[0][i] == 0:
-                entry.append((0, i))
-            if state[-1][i] == 0:
-                entry.append((self.n - 1, i))
             if state[i][0] == 0:
                 entry.append((i, 0))
             if state[i][-1] == 0:
-                entry.append((i, self.n - 1))
+                entry.append((i, self.m - 1))
+
+        for j in range(self.m):
+            if state[0][j] == 0:
+                entry.append((0, j))
+            if state[-1][j] == 0:
+                entry.append((self.n - 1, j))
 
         for i in range(len(entry)):
             state_copy = copy.deepcopy(state)
@@ -112,25 +117,25 @@ class GeneticGenerator:
         self.score = 0
 
         for i in range(self.n):
-            for j in range(self.n):
+            for j in range(self.m):
                 if state[i][j] == 1:
-                    if 1 < i < self.n - 2 and 1 < j < self.n - 2:
+                    if 1 < i < self.n - 2 and 1 < j < self.m - 2:
                         if state[i - 1][j] + state[i + 1][j] + state[i][j - 1] + state[i][j + 1] >= 3:
                             if state[i - 2][j] + state[i + 2][j] + state[i][j - 2] + state[i][j + 2] <= 2:
                                 score += 2
 
         return score
 
-    def start_evolution(self, tries=100):
+    def start_evolution(self, tries=10000):
         parents = self.generate_parents()
         chromosomes = []
         for i in range(len(parents)):
             chromosomes.append((parents[i], self.fitness_function_cave(parents[i])))
 
-        for k in range(tries):
+        for k in range(tries // 10):
             for i in range(len(parents)):
                 for j in range(10):
-                    child = self.apply_mutations(chromosomes[i][0], 6)
+                    child = self.apply_mutations(chromosomes[i][0], self.mutations)
                     result = self.fitness_function_cave(child)
                     if result > chromosomes[i][1]:
                         chromosomes[i] = (child, result)
@@ -138,16 +143,16 @@ class GeneticGenerator:
 
     def pretty_print(self, res):
         for i in range(len(res)):
-            print("-" * 15)
+            print("-" * self.m)
             for j in range(len(res[i][0])):
                 print(res[i][0][j])
-            print("-" * 15)
+            print("-" * self.m)
 
     def pretty_print_squares(self, res):
         for i in range(len(res)):
-            print("-" * 15)
+            print("-" * self.m)
             for j in range(len(res[i][0])):
                 for k in range(len(res[i][0][j])):
-                    print("⬜️" if res[i][0][j][k] == 0 else "⬛️", end = "")
+                    print("⬜️" if res[i][0][j][k] == 0 else "⬛️", end="")
                 print()
-            print("-" * 15)
+            print("-" * self.m)

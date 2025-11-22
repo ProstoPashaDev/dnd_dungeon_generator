@@ -7,7 +7,7 @@ print("Cave \nCave with rooms \nDragon cave")
 print("Human-built \nTomb \nSanctuary")
 print("-"*10)
 
-generic_generator = GeneticGenerator("Cave", "Small", "No", 1, 20)
+generic_generator = GeneticGenerator("Cave", "Small", "No", 1, 10, 30)
 cave = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [0, 0, 0, 0, 1, 1, 0, 1, 1, 1],
@@ -22,7 +22,7 @@ cave = [
 ]
 #print(generic_generator.fitness_function_cave(cave))
 
-res = generic_generator.start_evolution(1500)
+res = generic_generator.start_evolution(10000)
 #generic_generator.pretty_print(res)
 generic_generator.pretty_print_squares(res)
 
