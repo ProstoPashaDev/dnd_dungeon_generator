@@ -6,16 +6,15 @@ from src.dungeons.Cave import Cave
 class GeneticGenerator:
 
     def __init__(self, cave_type, size, traps, floors=1, n=10, m=30, maps=3, mutations=0):
-        self.type = cave_type
+        dungeons = {"Cave": Cave(n, m)}
         self.size = size
         self.traps = traps
         self.floors = floors
         self.n = n
         self.m = m
         self.maps = maps
-        self.mutations = mutations if mutations != 0 else max(n, m) // 4
-        self.score = 0
-        self.dungeon = Cave(n, m)
+        self.mutations = mutations if mutations != 0 else max(n, m) // 5
+        self.dungeon = dungeons[cave_type]
 
     def generate_parents(self):
         parents = []
