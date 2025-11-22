@@ -1,5 +1,6 @@
 import copy
 import random
+from src.dungeons.Cave import Cave
 
 
 class GeneticGenerator:
@@ -14,6 +15,7 @@ class GeneticGenerator:
         self.maps = maps
         self.mutations = mutations if mutations != 0 else max(n, m) // 4
         self.score = 0
+        self.dungeon = Cave(n, m)
 
     def generate_parents(self):
         parents = []
@@ -35,108 +37,17 @@ class GeneticGenerator:
             state_copy[i][j] = 0 if state[i][j] == 1 else 1
         return state_copy
 
-    def count_dist(self, i, j, state):
-        up, left, right, down = 0, 0, 0, 0
-        # up
-        s = 0
-        for i1 in range(0, i):
-            if state[i1][j] == 1:
-                s = i1
-        up = max(i - s - 1, 0)
-
-        # down
-        s = self.n - 1
-        for i1 in range(i + 1, self.n):
-            if state[i1][j] == 1:
-                s = i1
-                break
-        down = max(s - i - 1, 0)
-
-        # left
-        s = -1
-        for j1 in range(j):
-            if state[i][j1] == 1:
-                s = j1
-        left = max(j - s - 1, 0)
-
-        # right
-        s = self.m - 1
-        for j1 in range(j + 1, self.m):
-            if state[i][j1] == 1:
-                s = j1
-                break
-        right = max(s - j - 1, 0)
-
-        return left, up, right, down
-
-    def infection_cave(self, i, j, state):
-        if i == 0 or j == 0 or i == self.n - 1 or j == self.m - 1:
-            self.score -= 4
-        else:
-            self.score += 1
-
-        left, up, right, down = self.count_dist(i, j, state)
-        dist = sorted([left, up, right, down], reverse=True)
-        if dist[1] <= 2 and dist[2] <= 2 and dist[3] <= 2:
-            self.score += 1
-
-        state[i][j] = "*"
-
-        if i - 1 >= 0 and state[i - 1][j] == 0:
-            self.infection_cave(i - 1, j, state)
-
-        if i + 1 < self.n and state[i + 1][j] == 0:
-            self.infection_cave(i + 1, j, state)
-
-        if j - 1 >= 0 and state[i][j - 1] == 0:
-            self.infection_cave(i, j - 1, state)
-
-        if j + 1 < self.m and state[i][j + 1] == 0:
-            self.infection_cave(i, j + 1, state)
-
-    def fitness_function_cave(self, state):
-        entry = []
-        for i in range(self.n):
-            if state[i][0] == 0:
-                entry.append((i, 0))
-            if state[i][-1] == 0:
-                entry.append((i, self.m - 1))
-
-        for j in range(self.m):
-            if state[0][j] == 0:
-                entry.append((0, j))
-            if state[-1][j] == 0:
-                entry.append((self.n - 1, j))
-
-        for i in range(len(entry)):
-            state_copy = copy.deepcopy(state)
-            self.infection_cave(entry[i][0], entry[i][1], state_copy)
-            break
-
-        score = self.score
-        self.score = 0
-
-        for i in range(self.n):
-            for j in range(self.m):
-                if state[i][j] == 1:
-                    if 1 < i < self.n - 2 and 1 < j < self.m - 2:
-                        if state[i - 1][j] + state[i + 1][j] + state[i][j - 1] + state[i][j + 1] >= 3:
-                            if state[i - 2][j] + state[i + 2][j] + state[i][j - 2] + state[i][j + 2] <= 2:
-                                score += 2
-
-        return score
-
     def start_evolution(self, tries=10000):
         parents = self.generate_parents()
         chromosomes = []
         for i in range(len(parents)):
-            chromosomes.append((parents[i], self.fitness_function_cave(parents[i])))
+            chromosomes.append((parents[i], self.dungeon.fitness_function(parents[i])))
 
         for k in range(tries // 10):
             for i in range(len(parents)):
                 for j in range(10):
                     child = self.apply_mutations(chromosomes[i][0], self.mutations)
-                    result = self.fitness_function_cave(child)
+                    result = self.dungeon.fitness_function(child)
                     if result > chromosomes[i][1]:
                         chromosomes[i] = (child, result)
         return chromosomes
