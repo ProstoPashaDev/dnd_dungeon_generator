@@ -5,9 +5,17 @@ from src.dungeons.Dungeon import Dungeon
 
 class Cave(Dungeon):
 
-    def __init__(self, n, m):
-        self.n = n
-        self.m = m
+    def __init__(self, n, m, size):
+        self.sizes = {"small": (8, 18),
+                      "mid": (10, 30),
+                      "big": (15, 45)}
+
+        if not (n == 10 and m == 30):
+            self.n = n
+            self.m = m
+        else:
+            self.n = self.sizes[size][0]
+            self.m = self.sizes[size][1]
         self.score = 0
 
     def find_entry(self, state):
