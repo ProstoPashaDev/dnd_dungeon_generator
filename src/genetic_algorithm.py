@@ -1,12 +1,14 @@
 import copy
 import random
 from src.dungeons.Cave import Cave
+from src.dungeons.DragonCave import DragonCave
 
 
 class GeneticGenerator:
 
     def __init__(self, cave_type, size, floors=1, n=10, m=30, maps=3, mutations=0):
-        dungeons = {"Cave": Cave(n, m, size)}
+        dungeons = {"Cave": Cave(n, m, size),
+                    "Dragon cave": DragonCave(n, m, size)}
         self.size = size
         self.floors = floors
         self.maps = maps
@@ -17,7 +19,7 @@ class GeneticGenerator:
         else:
             self.n = self.dungeon.sizes[size][0]
             self.m = self.dungeon.sizes[size][1]
-        self.mutations = mutations if mutations != 0 else max(self.n, self.m) // 5
+        self.mutations = mutations if mutations != 0 else self.n * self.m // 50 + 1
 
     def generate_parents(self):
         parents = []

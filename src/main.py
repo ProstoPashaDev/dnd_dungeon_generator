@@ -7,7 +7,7 @@ print("Cave \nCave with rooms \nDragon cave")
 print("Human-built \nTomb \nSanctuary")
 print("-"*10)
 
-generic_generator = GeneticGenerator("Cave", "mid", 1, 10, 30)
+generic_generator = GeneticGenerator("Cave", "mid", 1)
 
 #print(generic_generator.fitness_function_cave(cave))
 
