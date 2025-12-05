@@ -19,7 +19,7 @@ class GeneticGenerator:
         else:
             self.n = self.dungeon.sizes[size][0]
             self.m = self.dungeon.sizes[size][1]
-        self.mutations = mutations if mutations != 0 else self.n * self.m // 50 + 1
+        self.mutations = mutations if mutations != 0 else self.n * self.m // 50
 
     def generate_parents(self):
         parents = []

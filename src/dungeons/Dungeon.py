@@ -32,14 +32,22 @@ class Dungeon(ABC):
     def increase_points_space(self, increase=1):
         return increase
 
-    def increase_notbig_space(self, i, j, n, m, state, increase=1, decrease=0):
+    def increase_notbig_space(self, i, j, n, m, state, space=2, increase=1, decrease=0):
         left, up, right, down = count_dist(i, j, state, n, m)
         dist = sorted([left, up, right, down], reverse=True)
-        if dist[1] <= 2 and dist[2] <= 2 and dist[3] <= 2:
+        if dist[1] <= space and dist[2] <= space and dist[3] <= space:
             return increase
-        return decrease
+        return -decrease
 
     def increase_midwalls(self, n, m, state, increase=2.3):
+        """
+        Increase score for connected group of 1 around 1 in close radius and 0 in far radius
+        :param n:
+        :param m:
+        :param state:
+        :param increase:
+        :return:
+        """
         score = 0
         for i in range(n):
             for j in range(m):

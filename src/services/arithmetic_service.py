@@ -9,11 +9,14 @@ def count_dist(i, j, state, n, m):
 
     # down
     s = n - 1
-    for i1 in range(i + 1, n):
-        if state[i1][j] == 1:
-            s = i1
-            break
-    down = max(s - i - 1, 0)
+    if i == n - 1:
+        down = 0
+    else:
+        for i1 in range(i + 1, n):
+            if state[i1][j] == 1:
+                s = i1
+                break
+        down = max(s - i - 1, 0)
 
     # left
     s = -1
@@ -24,11 +27,14 @@ def count_dist(i, j, state, n, m):
 
     # right
     s = m - 1
-    for j1 in range(j + 1, m):
-        if state[i][j1] == 1:
-            s = j1
-            break
-    right = max(s - j - 1, 0)
+    if j == m - 1:
+        right = 0
+    else:
+        for j1 in range(j + 1, m):
+            if state[i][j1] == 1:
+                s = j1
+                break
+        right = max(s - j - 1, 0)
 
     return left, up, right, down
 
